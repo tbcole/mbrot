@@ -1,5 +1,5 @@
+from PIL import Image
 import numpy as np
-import matplotlib.pyplot as plt
 
 def f(z0, c):
     return z0**2+c
@@ -23,37 +23,22 @@ def mandelbrot(c:complex, z0=0, tol=255):
 #since Mandelbrot set is defined to be the complex points that f(z) = z^2 + c
 #we only want points within the range x=[-2,2], y=[-2,2], c = x +iy, otherwise #the point will be ommited because it is outside of the condition for the set
 
-Nx = 800 #num of pixels
+Nx = 512 #num of pixels
 Ny = Nx
-x = np.linspace(-2, 0.5, Nx)
-y = np.linspace(-1.5, 1.5, Ny)
-N = Nx*Ny
-print(N)
 
-pixval = []
-for Y in y:
-    for X in x:
-        c = X + 1j*Y
-        pixval.append(mandelbrot(c))
+xmin = -2
+xmax = 2
+ymin = xmin
+ymax = xmax
 
-site = np.arange(0, int(N), 1)
-coor = np.zeros((N, 2))
-for i in range(0, Nx):
-    percent = int((i/Nx)*100)
-    if percent == 75:
-        print('75%')
-    if percent == 50:
-        print('50%')
-    if percent == 25:
-        print('25%')
+image = Image.new("RGB", (Nx, Ny))
 
-    for j in range(0, Ny):
-        n = i + Nx*j
-        coor[n, 0] =  x[i]
-        coor[n, 1] = y[j]
+for y in range(Ny):
+    zy = y * (ymax-ymin) / (Ny-1) + ymin
+    for x in range(Nx):
+        zx = x *(xmax-xmin)/ (Nx-1) + xmin
+        C = zx + 1j*zy
+        i = mandelbrot(C)
+        image.putpixel((x,y), (i%4*64, i%8*32, i%16*16))
 
-plt.scatter(coor[:, 0], coor[:, 1], c=pixval, cmap = 'plasma')
-plt.ylim(-1.5, 1.5)
-plt.xlim(-2, 0.5)
-plt.savefig('mandelbrot.jpg')
-plt.show()
+image.show()
